@@ -257,6 +257,7 @@ class Director(InfraHost):
             # Discover the nodes using static IPs for the iDRAC
             for node in (self.settings.controller_nodes +
                          self.settings.compute_nodes +
+                         self.settings.computehci_nodes +
                          self.settings.ceph_nodes):
                 if hasattr(node, "idrac_ip"):
                     cmd += ' ' + node.idrac_ip
@@ -282,7 +283,7 @@ class Director(InfraHost):
         logger.debug("Verify the number of nodes picked match up to settings")
         expected_nodes = len(self.settings.controller_nodes) + len(
             self.settings.compute_nodes) + len(
-            self.settings.ceph_nodes)
+            self.settings.ceph_nodes) + len(self.settings.computehci_nodes)
         found = self.run_tty(
             "grep pm_addr ~/instackenv.json | wc -l")[0].rstrip()
         logger.debug("Found " + found + " Expected : " + str(expected_nodes))
@@ -301,6 +302,7 @@ class Director(InfraHost):
     def configure_idracs(self):
         nodes = list(self.settings.controller_nodes)
         nodes.extend(self.settings.compute_nodes)
+        node.extend(self.settings.comutehci_nodes)
         nodes.extend(self.settings.ceph_nodes)
         cmd = "~/pilot/config_idracs.py "
 
@@ -404,6 +406,7 @@ class Director(InfraHost):
         roles_to_nodes = {}
         roles_to_nodes["controller"] = self.settings.controller_nodes
         roles_to_nodes["compute"] = self.settings.compute_nodes
+        roles_to_nodes["computehci"] = self.settings.computehci_nodes
         roles_to_nodes["storage"] = self.settings.ceph_nodes
 
         threads = []
@@ -440,6 +443,7 @@ class Director(InfraHost):
         # Required for assign_role to run threaded if stamp has > 10 nodes
         non_sah_nodes = (self.settings.controller_nodes +
                          self.settings.compute_nodes +
+                         self.settings.computehci_nodes +
                          self.settings.ceph_nodes)
         # Allow for the number of nodes + a few extra sessions
         maxSessions = len(non_sah_nodes) + 10
@@ -1191,11 +1195,13 @@ class Director(InfraHost):
             compute_tenant_tunnel_ips = ''
             compute_private_ips = ''
             compute_storage_ips = ''
+            compute_storage_cluster_ip = ''
 
             for node in self.settings.compute_nodes:
                 compute_tenant_tunnel_ips += "    - " + node.tenant_tunnel_ip
                 compute_private_ips += "    - " + node.private_api_ip
                 compute_storage_ips += "    - " + node.storage_ip
+                #TODO add computehci and cluster network updates below...
                 if node != self.settings.compute_nodes[-1]:
                     compute_tenant_tunnel_ips += "\\n"
                     compute_private_ips += "\\n"
@@ -1373,6 +1379,7 @@ class Director(InfraHost):
         logger.debug("Configuring network settings for overcloud")
         cmd = "rm -f " + self.home_dir + '/.ssh/known_hosts'
         self.run_tty(cmd)
+        #TODO add computehci
         cmd = self.source_stackrc + "cd" \
                                     " ~/pilot;./deploy-overcloud.py" \
                                     " --dell-computes " + \
