@@ -302,7 +302,7 @@ class Director(InfraHost):
     def configure_idracs(self):
         nodes = list(self.settings.controller_nodes)
         nodes.extend(self.settings.compute_nodes)
-        node.extend(self.settings.comutehci_nodes)
+        nodes.extend(self.settings.computehci_nodes)
         nodes.extend(self.settings.ceph_nodes)
         cmd = "~/pilot/config_idracs.py "
 
@@ -537,8 +537,15 @@ class Director(InfraHost):
                 num_osds += 1
             total_osds = total_osds + num_osds
 
-        num_storage_nodes = len(self.settings.ceph_nodes)
+        num_storage_nodes = len(self.settings.ceph_nodes) + len(self.settings.computehci_nodes)
+        for node in self.settings.computehci_nodes:
+            try:
+                if len(node.osd_disks) > 0:
+                    num_storage_nodes = num_storage_nodes - 1
+            except:
+                pass
         num_unaccounted = num_storage_nodes - len(uuid_to_osd_configs)
+        # Also add nodes with osds defined in properties to allow for mix of configs
         if num_unaccounted < 0:
             raise AssertionError("There are extraneous servers listed in {}. "
                                  "Unable to calculate the number of OSDs in "
@@ -559,11 +566,15 @@ class Director(InfraHost):
 
         # If the osd_disks were not specified then just return
         osd_disks = None
-        if hasattr(self.settings.ceph_nodes[0], 'osd_disks'):
-            # If the OSD disks are specified on the first storage node, then
-            # use them.  This is the best we can do until the OSP Director
-            # supports more than a single, global OSD configuration.
-            osd_disks = self.settings.ceph_nodes[0].osd_disks
+        if len(self.settings.computehci_nodes) > 0 :
+            osd_disks = self.settings.computehci_nodes[0].osd_disks
+
+        else:
+            if hasattr(self.settings.ceph_nodes[0], 'osd_disks'):
+               # If the OSD disks are specified on the first storage node, then
+               # use them.  This is the best we can do until the OSP Director
+               # supports more than a single, global OSD configuration.
+               osd_disks = self.settings.ceph_nodes[0].osd_disks
 
         src_file = open(self.settings.dell_env_yaml, 'r')
 
@@ -1201,11 +1212,27 @@ class Director(InfraHost):
                 compute_tenant_tunnel_ips += "    - " + node.tenant_tunnel_ip
                 compute_private_ips += "    - " + node.private_api_ip
                 compute_storage_ips += "    - " + node.storage_ip
-                #TODO add computehci and cluster network updates below...
                 if node != self.settings.compute_nodes[-1]:
                     compute_tenant_tunnel_ips += "\\n"
                     compute_private_ips += "\\n"
                     compute_storage_ips += "\\n"
+
+            computehci_tenant_tunnel_ips =''
+            computehci_private_ips = ''
+            computehci_storage_ips = ''
+            computehci_cluster_ips = ''
+
+            for node in self.settings.computehci_nodes:
+                computehci_tenant_tunnel_ips += "    - " + node.tenant_tunnel_ip
+                computehci_private_ips += "    - " + node.private_api_ip
+                computehci_storage_ips += "    - " + node.storage_ip
+                computehci_cluster_ips += "    - " + node.storage_cluster_ip
+                if node != self.settings.computehci_nodes[-1]:
+                    computehci_tenant_tunnel_ips += "\\n"
+                    computehci_private_ips += "\\n"
+                    computehci_storage_ips += "\\n"
+                    computehci_cluster_ips += "\\n"
+            #TODO :: update for above below ... 
 
             storage_storgage_ip = ''
             storage_cluster_ip = ''
@@ -1379,11 +1406,12 @@ class Director(InfraHost):
         logger.debug("Configuring network settings for overcloud")
         cmd = "rm -f " + self.home_dir + '/.ssh/known_hosts'
         self.run_tty(cmd)
-        #TODO add computehci
         cmd = self.source_stackrc + "cd" \
                                     " ~/pilot;./deploy-overcloud.py" \
                                     " --dell-computes " + \
                                     str(len(self.settings.compute_nodes)) + \
+                                    " --dell-computeshci " + \
+                                    str(len(self.settings.computehci_nodes)) + \
                                     " --controllers " + \
                                     str(len(self.settings.controller_nodes
                                             )) + \

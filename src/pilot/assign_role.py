@@ -98,7 +98,7 @@ ROLES = {
     'controller': 'control',
     'compute': 'compute',
     'storage': 'ceph-storage',
-    'computehci': 'ceph-storage'
+    'computehci': 'computehci'
 }
 
 # TODO: Use the OpenStack Oslo logging library, instead of the Python standard
@@ -264,6 +264,9 @@ def define_target_raid_config(role, drac_client):
         logical_disks = define_compute_logical_disks(drac_client,
                                                      raid_controller_name)
     elif role == 'storage':
+        logical_disks = define_storage_logical_disks(drac_client,
+                                                     raid_controller_name)
+    elif role == 'computehci':
         logical_disks = define_storage_logical_disks(drac_client,
                                                      raid_controller_name)
     else:
@@ -886,7 +889,7 @@ def assign_role(ip_mac_service_tag, node_uuid, role_index, os_volume_size_gb,
                      node_uuid)
 
     # Generate Ceph OSD/journal configuration for storage nodes
-    if flavor == "ceph-storage":
+    if flavor == "ceph-storage" or flavor =="computehci":
         generate_osd_config(ip_mac_service_tag, drac_client)
 
 

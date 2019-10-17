@@ -649,7 +649,7 @@ class Settings():
                 try:
                     if node.is_computehci == "true":
                         node.is_computehci = True
-                        self.controllerhci_nodes.append(node)
+                        self.computehci_nodes.append(node)
                 except AttributeError:
                     node.is_computehci = False
                     pass

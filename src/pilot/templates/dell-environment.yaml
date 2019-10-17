@@ -55,6 +55,9 @@ parameter_defaults:
     # KernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=176 iommu=pt intel_iommu=on"
 
   # Number of Dell Compute nodes 
+  DellComputeCount: 3
+
+  # Number of Dell Compute nodes 
   DellComputeHCICount: 3
 
   # Apply tuned-adm profile on Compute Nodes
