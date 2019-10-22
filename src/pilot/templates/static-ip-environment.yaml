@@ -119,3 +119,11 @@ parameter_defaults:
     - 192.168.180.76
     - 192.168.180.77
     - 192.168.180.78
+
+  # CHANGEME: The Compute HCI node ips
+  DellComputeHCIIPs:
+    tenant:
+    internal_api:
+    storage:
+    storage_mgmt:
+

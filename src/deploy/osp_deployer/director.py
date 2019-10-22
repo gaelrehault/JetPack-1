@@ -538,12 +538,12 @@ class Director(InfraHost):
             total_osds = total_osds + num_osds
 
         num_storage_nodes = len(self.settings.ceph_nodes) + len(self.settings.computehci_nodes)
-        for node in self.settings.computehci_nodes:
-            try:
-                if len(node.osd_disks) > 0:
-                    num_storage_nodes = num_storage_nodes - 1
-            except:
-                pass
+        #for node in self.settings.computehci_nodes:
+        #    try:
+        #        if len(node.osd_disks) > 0:
+        #            num_storage_nodes = num_storage_nodes - 1
+        #    except:
+        #        pass
         num_unaccounted = num_storage_nodes - len(uuid_to_osd_configs)
         # Also add nodes with osds defined in properties to allow for mix of configs
         if num_unaccounted < 0:
@@ -558,7 +558,7 @@ class Director(InfraHost):
                                      self.settings.ceph_osd_config_yaml))
 
         total_osds = total_osds + (num_unaccounted * default_osds_per_node)
-
+        logger.debug("Total osds : " + str(total_osds))
         return total_osds
 
     def setup_environment(self):
@@ -566,11 +566,11 @@ class Director(InfraHost):
 
         # If the osd_disks were not specified then just return
         osd_disks = None
-        if len(self.settings.computehci_nodes) > 0 :
+        if len(self.settings.computehci_nodes) > 0 and hasattr(self.settings.computehci_nodes[0], 'osd_disks'):
             osd_disks = self.settings.computehci_nodes[0].osd_disks
 
         else:
-            if hasattr(self.settings.ceph_nodes[0], 'osd_disks'):
+            if len(self.settings.ceph_nodes) > 0 and hasattr(self.settings.ceph_nodes[0], 'osd_disks'):
                # If the OSD disks are specified on the first storage node, then
                # use them.  This is the best we can do until the OSP Director
                # supports more than a single, global OSD configuration.
@@ -1232,7 +1232,6 @@ class Director(InfraHost):
                     computehci_private_ips += "\\n"
                     computehci_storage_ips += "\\n"
                     computehci_cluster_ips += "\\n"
-            #TODO :: update for above below ... 
 
             storage_storgage_ip = ''
             storage_cluster_ip = ''
@@ -1271,7 +1270,16 @@ class Director(InfraHost):
                     s/storage_mgmt:/storage_mgmt: \\n' +
                     storage_cluster_ip + "/\" " + static_ips_yaml
                     ]
-
+            if len(self.settings.computehci_nodes) > 0:
+                cmds.extend(['sed -i "/DellComputeHCIIPs:/,/tenant:/s/tenant:/tenant: \\n' +
+                           computehci_tenant_tunnel_ips + "/\" " + static_ips_yaml,
+                           'sed -i "/DellComputeHCIIPs:/,/internal_api:/s/internal_api:/internal_api: \\n' +
+                           computehci_private_ips + "/\" " + static_ips_yaml,
+                           'sed -i "/DellComputeHCIIPs:/,/storage:/s/storage:/storage: \\n' +
+                           computehci_storage_ips + "/\" " + static_ips_yaml,
+                           'sed -i "/DellComputeHCIIPs:/,/storage_mgmt:/s/storage_mgmt:/storage_mgmt: \\n' +
+                           computehci_cluster_ips + "/\" " + static_ips_yaml
+                          ]) 
             for cmd in cmds:
                 self.run_tty(cmd)
 

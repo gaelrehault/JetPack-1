@@ -14,7 +14,7 @@
 
 resource_registry:
   OS::TripleO::Controller::Net::SoftwareConfig: ./controller.yaml
-  OS::TripleO::ComputeHCI::Net::SoftwareConfig: ./dellcomputehci.yaml
+  OS::TripleO::Compute::Net::SoftwareConfig: ./dellcomputehci.yaml
 
 
 parameter_defaults:
@@ -32,11 +32,11 @@ parameter_defaults:
   # CHANGEME: Change the interface names in the following lines for the
   # compute HCI nodes provisioning interface and to include in the compute
   # nodes bonds
-  ComputeHCIProvisioningInterface: em3
-  ComputeHCIBond0Interface1: em1
-  ComputeHCIBond0Interface2: p3p1
-  ComputeHCIBond1Interface1: em2
-  ComputeHCIBond1Interface2: p3p2
+  ComputeProvisioningInterface: em3
+  ComputeBond0Interface1: em1
+  ComputeBond0Interface2: p3p1
+  ComputeBond1Interface1: em2
+  ComputeBond1Interface2: p3p2
   # The bonding mode to use for compute nodes
-  ComputeHCIBondInterfaceOptions: mode=802.3ad miimon=100 xmit_hash_policy=layer3+4 lacp_rate=1
+  ComputeBondInterfaceOptions: mode=802.3ad miimon=100 xmit_hash_policy=layer3+4 lacp_rate=1
 
