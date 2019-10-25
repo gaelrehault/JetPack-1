@@ -31,7 +31,9 @@ parameter_defaults:
   # You would use this for the default floating network
   NeutronBridgeMappings: physint:br-tenant,physext:br-ex
 
-  # Flavor used as the regular compute
+  # Flavor used as the compute
+  OvercloudDellComputeFlavor: baremetal
+  # Flavor used for HCI nodes
   OvercloudDellComputeHCIFlavor: baremetal
   # Flavor to use for the Controller nodes
   OvercloudControllerFlavor: baremetal
