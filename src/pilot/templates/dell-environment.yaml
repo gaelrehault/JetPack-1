@@ -121,6 +121,9 @@ parameter_defaults:
     nb_retry_wait_osd_up: 360
     delay_wait_osd_up: 60
 
+  DellComputeHCIExtraConfig:
+    NovaReservedHostMemory: 115000
+
   NovaComputeExtraConfig:
     nova::migration::libvirt::live_migration_completion_timeout: 800
     nova::migration::libvirt::live_migration_progress_timeout: 150

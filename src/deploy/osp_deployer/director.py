@@ -913,7 +913,7 @@ class Director(InfraHost):
         else:
 
             cinder_container = "/dellemc/openstack-cinder-volume-dellemc:" + \
-                self.settings.cinder_unity_container_version
+                str(self.settings.cinder_unity_container_version)
             remote_registry = "registry.connect.redhat.com"
             remote_url = remote_registry + cinder_container
             local_registry = self.provisioning_ip + ":8787"
