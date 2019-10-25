@@ -54,6 +54,8 @@ eula --agreed
 %packages
 @gnome-desktop
 @internet-browser
+@x11
+@dns-server
 @ftp-server
 @file-server
 @network-file-system-client
@@ -63,8 +65,12 @@ eula --agreed
 @virtualization-client
 @virtualization-hypervisor
 @virtualization-tools
-chrony
+dhcp
+ntp
+ntpdate
+-chrony
 -firewalld
+system-config-firewall-base
 %end
 
 
@@ -589,7 +595,9 @@ fi
 
 subscription-manager repos ${ProxyInfo} '--disable=*' --enable=rhel-7-server-rpms --enable=rhel-7-server-optional-rpms
 
+systemctl disable NetworkManager
 systemctl disable firewalld
+systemctl disable chronyd
 
 mkdir -p /store/data/images
 mkdir -p /store/data/iso
