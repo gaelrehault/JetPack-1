@@ -338,8 +338,6 @@ class Checkpoints():
                 "the provisioning network : " + test)
 
     def verify_nodes_registered_in_ironic(self):
-        #TODO: remove below
-        return
         logger.debug("Verify the expected amount of nodes imported in ironic")
         cmd = "source ~/stackrc;openstack baremetal node list | grep None"
         setts = self.settings

@@ -538,12 +538,6 @@ class Director(InfraHost):
             total_osds = total_osds + num_osds
 
         num_storage_nodes = len(self.settings.ceph_nodes) + len(self.settings.computehci_nodes)
-        #for node in self.settings.computehci_nodes:
-        #    try:
-        #        if len(node.osd_disks) > 0:
-        #            num_storage_nodes = num_storage_nodes - 1
-        #    except:
-        #        pass
         num_unaccounted = num_storage_nodes - len(uuid_to_osd_configs)
         # Also add nodes with osds defined in properties to allow for mix of configs
         if num_unaccounted < 0:
