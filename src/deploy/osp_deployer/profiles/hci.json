@@ -190,11 +190,12 @@
             "sah_bond_opts": "",
             "nic_env_file": {
                "valid_values": [
-                  "5_port/nic_environment.yaml"
+                  "5_port_hci/nic_environment.yaml",
+                  "4_port_hci/nic_environment.yaml"
                ]
             },
             "ControllerBondInterfaceOptions": "",
-            "ComputeBondInterfaceOptions": "",
+            "ComputeBondInterfaceOptions": ""
          }
       },
       {
