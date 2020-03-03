@@ -846,6 +846,7 @@ class Director(InfraHost):
         # Powermax
         dell_powermax_iscsi_cinder_yaml = self.templates_dir + \
             "/dellemc-powermax-iscsi-cinder-backend.yaml"
+
         self.upload_file(self.settings.dell_powermax_iscsi_cinder_yaml,
                          dell_powermax_iscsi_cinder_yaml)
         dell_powermax_fc_cinder_yaml = self.templates_dir + \
@@ -863,7 +864,6 @@ class Director(InfraHost):
             self.setup_powermax_cinder(dell_powermax_iscsi_cinder_yaml)
         else:
             self.setup_powermax_cinder(dell_powermax_fc_cinder_yaml)
-
         # Enable multiple backends now
         enabled_backends = "["
 
